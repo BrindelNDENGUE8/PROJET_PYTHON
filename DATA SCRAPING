@@ -1,0 +1,8 @@
+# pour effectuer une extraction de données web (scraping) nous aurons besoins d'installer et d'importer deux libraries : requests et BeautifulSoup
+    # pour la librarie requests,elle s'installe de la maniere suivante: pip install requests dans le cmd de anaconda
+import requests
+url = "https://best.aliexpress.com//"
+page = requests.get(url)
+
+# Voir le code html source
+print(page.content) # affiche le contenu non formaté
