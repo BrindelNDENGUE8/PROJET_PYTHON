@@ -1,0 +1,42 @@
+import requests
+from bs4 import BeautifulSoup
+
+base_url = "https://best.aliexpress.com/"
+products_limit = 100
+current_page = 1
+all_products = []
+
+def extract_products(page_url):
+    try:
+        response = requests.get(page_url)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.content, 'html.parser')
+        return soup.select(".grid-3--cardBox--12zkKz3, .water-fall--ele--17TIGw2, .recommend-card--recommend-card--36CHUyg.more-to-love--new-version--2_zp2hT")
+    except requests.exceptions.RequestException:
+        return []
+
+def get_all_products():
+    global current_page
+    while len(all_products) < products_limit and current_page <= 12:
+        products_on_page = extract_products(f"{base_url}?page={current_page}")
+        if not products_on_page: break
+        all_products.extend(products_on_page)
+        current_page += 1
+    return all_products[:products_limit]
+
+def display_products(products):
+    for idx, product in enumerate(products, start=1):
+        name = product.find(class_="src--title--3I7Ij6g")
+        image = product.find('img')
+        link = product.find('a', href=True)
+
+        print(f"Produit {idx} :")
+        print(f"Nom : {name.text.strip() if name else 'Non disponible'}")
+        print(f"Lien de l'image : https:{image['src']}" if image else "Image non disponible.")
+        print(f"Lien vers le produit : https:{link['href']}" if link else "Lien non disponible.")
+        print("-" * 145)
+
+# Exécuter le script
+products = get_all_products()
+display_products(products)
+ # ainsi nous obtenons la liste de 100 produits du site "best.aliexpress.com"
